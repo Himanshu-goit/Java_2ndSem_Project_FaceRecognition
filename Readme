@@ -1,0 +1,30 @@
+# 👤 Face Recognition Java App (GUI + MySQL)
+
+This Java application demonstrates a **Face Recognition system** using a **Swing GUI**, **MySQL database**, and **OOP principles**. It currently simulates face detection and stores user details in a MySQL database.
+
+## 📌 Features
+
+- GUI built with `Swing`
+- Object-Oriented Programming (Encapsulation, Classes)
+- JDBC connection to MySQL
+- Simulated face detection (OpenCV integration ready)
+- Input validation and exception handling
+
+---
+
+## 🚀 Technologies Used
+
+- Java (JDK 8+)
+- Swing (GUI)
+- MySQL (via JDBC)
+- JDBC Connector (`mysql-connector-java`)
+
+---
+
+## 🧑‍💻 How to Run
+
+### 1. 📦 Clone the Repository
+
+```bash
+git clone https://github.com/your-username/face-recognition-java.git
+cd face-recognition-java
