@@ -1,30 +1,38 @@
-# 👤 Face Recognition Java App (GUI + MySQL)
+# Face Recognition App
 
-This Java application demonstrates a **Face Recognition system** using a **Swing GUI**, **MySQL database**, and **OOP principles**. It currently simulates face detection and stores user details in a MySQL database.
-
-## 📌 Features
-
-- GUI built with `Swing`
-- Object-Oriented Programming (Encapsulation, Classes)
-- JDBC connection to MySQL
-- Simulated face detection (OpenCV integration ready)
-- Input validation and exception handling
+A simple Java Swing-based GUI application that simulates face detection and stores user data (name and email) into a MySQL database. This project demonstrates the use of Java GUI, JDBC, and multithreading (via `SwingWorker`), and is designed for easy integration with actual face recognition libraries like OpenCV.
 
 ---
 
-## 🚀 Technologies Used
+## 🧩 Features
 
-- Java (JDK 8+)
-- Swing (GUI)
-- MySQL (via JDBC)
-- JDBC Connector (`mysql-connector-java`)
+- GUI interface using **Java Swing**
+- User input form with validation
+- Simulated **face detection** process
+- Saves user details to a **MySQL database**
+- Uses **multithreading** for responsive UI
+- Clean structure with encapsulated classes
 
 ---
 
-## 🧑‍💻 How to Run
+## 🚀 Getting Started
 
-### 1. 📦 Clone the Repository
+### Prerequisites
 
-```bash
-git clone https://github.com/your-username/face-recognition-java.git
-cd face-recognition-java
+- Java Development Kit (JDK) 8 or higher
+- MySQL server
+- A MySQL database named `facerecognition` with a table `users`
+- MySQL JDBC driver (add to your project classpath)
+
+### MySQL Table Setup
+
+```sql
+CREATE DATABASE facerecognition;
+
+USE facerecognition;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL
+);
