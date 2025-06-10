@@ -16,7 +16,7 @@ class User {
     public String getEmail() { return email; }
 }
 
-// DatabaseManager – JDBC
+// DatabaseManager – JDBC with exception handling
 class DatabaseManager {
     private Connection conn;
 
@@ -24,10 +24,10 @@ class DatabaseManager {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/facerecognition", "root", "Astitva24@" 
+                "jdbc:mysql://localhost:3306/facerecognition", "root", "Astitva24@"
             );
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Database connection error:\n" + e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            showError("Database connection error", e);
         }
     }
 
@@ -39,22 +39,28 @@ class DatabaseManager {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Insert failed:\n" + e.getMessage());
+            showError("Insert failed", e);
             return false;
         }
     }
-}
 
-// FaceRecognition – Placeholder
-class FaceRecognition {
-    public static boolean detectFace() {
-        // Placeholder logic — Replace with OpenCV later
-        System.out.println("Simulated face detection logic.");
-        return true;
+    private void showError(String message, Exception e) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(null, message + ":\n" + e.getMessage());
+        });
     }
 }
 
-// GUI + Integration
+// FaceRecognition – Simulated
+class FaceRecognition {
+    public static boolean detectFace() throws InterruptedException {
+        Thread.sleep(1000); // Simulate processing time
+        System.out.println("Simulated face detection logic.");
+        return true; // Replace with actual OpenCV logic later
+    }
+}
+
+// GUI + Integration with multithreading
 public class FaceRecognitionApp extends JFrame {
     private JTextField nameField, emailField;
     private JButton detectButton;
@@ -88,34 +94,51 @@ public class FaceRecognitionApp extends JFrame {
 
         dbManager = new DatabaseManager();
 
-        detectButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String name = nameField.getText().trim();
-                String email = emailField.getText().trim();
+        detectButton.addActionListener(e -> handleDetectAndSave());
+    }
 
-                if (name.isEmpty() || email.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "All fields are required.");
-                    return;
-                }
+    private void handleDetectAndSave() {
+        String name = nameField.getText().trim();
+        String email = emailField.getText().trim();
 
-                if (FaceRecognition.detectFace()) {
-                    User user = new User(name, email);
-                    boolean success = dbManager.insertUser(user);
-                    if (success) {
-                        JOptionPane.showMessageDialog(null, "User saved successfully.");
-                        nameField.setText("");
-                        emailField.setText("");
+        if (name.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields are required.");
+            return;
+        }
+
+        detectButton.setEnabled(false);
+
+        new SwingWorker<Void, Void>() {
+            protected Void doInBackground() {
+                try {
+                    if (FaceRecognition.detectFace()) {
+                        User user = new User(name, email);
+                        boolean success = dbManager.insertUser(user);
+                        SwingUtilities.invokeLater(() -> {
+                            if (success) {
+                                JOptionPane.showMessageDialog(null, "User saved successfully.");
+                                nameField.setText("");
+                                emailField.setText("");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Failed to save user.");
+                            }
+                        });
                     } else {
-                        JOptionPane.showMessageDialog(null, "Failed to save user.");
+                        JOptionPane.showMessageDialog(null, "Face not detected.");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Face not detected.");
+                } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(null, "Face detection interrupted.");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Unexpected error:\n" + ex.getMessage());
+                } finally {
+                    SwingUtilities.invokeLater(() -> detectButton.setEnabled(true));
                 }
+                return null;
             }
-        });
+        }.execute();
     }
 
     public static void main(String[] args) {
-        new FaceRecognitionApp().setVisible(true);
+        SwingUtilities.invokeLater(() -> new FaceRecognitionApp().setVisible(true));
     }
 }
